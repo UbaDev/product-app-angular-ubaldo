@@ -1,0 +1,88 @@
+<div class="product-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">Descubre Productos Increíbles</h1>
+      <p class="hero-subtitle">Encuentra exactamente lo que buscas en nuestra colección curada</p>
+    </div>
+  </section>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-section">
+    <div class="loading-content">
+      <mat-spinner diameter="60" class="loading-spinner"></mat-spinner>
+      <h3>Cargando productos increíbles...</h3>
+      <p>Preparando la mejor experiencia para ti</p>
+    </div>
+  </div>
+
+  <!-- Products Grid -->
+  <section *ngIf="!isLoading" class="products-section">
+    <div class="section-header">
+      <h2 class="section-title">Catálogo de Productos</h2>
+      <p class="section-subtitle">{{ products.length }} productos disponibles</p>
+    </div>
+
+    <div class="products-grid">
+      <article *ngFor="let product of products; trackBy: trackByProductId" 
+               class="product-card">
+        
+        <!-- Product Image -->
+        <div class="product-image-container">
+          <img [src]="product.image" 
+               [alt]="product.title" 
+               class="product-image"
+               loading="lazy">
+          <div class="image-overlay">
+            <button mat-fab color="accent" class="quick-view-btn">
+              <mat-icon>visibility</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Product Content -->
+        <div class="product-content">
+          <!-- Category Chip -->
+          <mat-chip-set class="category-chips">
+            <mat-chip [color]="getCategoryColor(product.category)" selected>
+              {{ product.category | titlecase }}
+            </mat-chip>
+          </mat-chip-set>
+
+          <!-- Product Title -->
+          <h3 class="product-title">{{ product.title }}</h3>
+
+          <!-- Rating -->
+          <div *ngIf="product.rating" class="rating-section">
+            <div class="stars">
+              <mat-icon *ngFor="let star of getStarArray(product.rating.rate)" 
+                        class="star" 
+                        [class.filled]="star === 1">
+                star
+              </mat-icon>
+            </div>
+            <span class="rating-text">{{ product.rating.rate }} ({{ product.rating.count }})</span>
+          </div>
+
+          <!-- Price -->
+          <div class="price-section">
+            <span class="price">${{ product.price | number:'1.2-2' }}</span>
+            <span class="price-label">USD</span>
+          </div>
+
+          <!-- Actions -->
+          <div class="product-actions">
+            <button mat-raised-button color="primary" class="action-btn primary-btn">
+              <mat-icon>add_shopping_cart</mat-icon>
+              Agregar al Carrito
+            </button>
+            <button mat-stroked-button color="accent" class="action-btn secondary-btn">
+              <mat-icon>favorite_border</mat-icon>
+              Me Gusta
+            </button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+</div>
