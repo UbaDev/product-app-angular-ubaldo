@@ -206,7 +206,7 @@ https://product-app-angular-ubaldo-d4dm.vercel.app/
 
 
 - [Repositorio GitHub](https://github.com/tu-usuario/product-app-angular-tu-ubaldo)
-- [Demo en Vivo](https://tu-demo-url.vercel.app)
+- [Demo en Vivo](https://product-app-angular-ubaldo-oxws.vercel.app/)
 - [FakeStore API Documentation](https://fakestoreapi.com/docs)
 - [Angular Documentation](https://angular.io/docs)
 - [Angular Material Components](https://material.angular.io)
@@ -218,7 +218,7 @@ https://product-app-angular-ubaldo-d4dm.vercel.app/
 ![Tabla de Productos](./src/assets/tabla.png)
 
 ### Formulario de Crear/Editar
-![Formulario CRUD](./src/assets//agregar.png)
+![Formulario CRUD](./src/assets/agregar.png)
 
 ### Confirmación de Eliminación
 ![Confirmación Delete](./src/assets//eliminar.png)
