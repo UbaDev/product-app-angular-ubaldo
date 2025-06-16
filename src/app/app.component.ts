@@ -10,26 +10,16 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [RouterOutlet, MatToolbarModule, MatIconModule, MatButtonModule, CommonModule],
   template: `
-    <!-- Partículas de fondo -->
-    <div class="background-particles">
-      <div *ngFor="let particle of particles" 
-           class="particle" 
-           [style.left.%]="particle.x" 
-           [style.top.%]="particle.y"
-           [style.animation-delay.s]="particle.delay">
-      </div>
-    </div>
-
-    <!-- Navbar futurista -->
-    <nav class="futuristic-navbar">
+    <!-- Navbar corregido -->
+    <nav class="main-navbar">
       <div class="navbar-content">
         <div class="brand-section">
           <div class="brand-icon-container">
-            <mat-icon class="brand-icon">rocket_launch</mat-icon>
+            <mat-icon class="brand-icon">inventory_2</mat-icon>
           </div>
           <div class="brand-text">
-            <h1>UBALDO</h1>
-            <span>Store</span>
+            <h1>Gestión de Productos</h1>
+            <span>Panel Administrativo</span>
           </div>
         </div>
         
@@ -38,7 +28,7 @@ import { CommonModule } from '@angular/common';
             <mat-icon>search</mat-icon>
           </button>
           <button mat-icon-button class="nav-button">
-            <mat-icon>notifications</mat-icon>
+            <mat-icon>settings</mat-icon>
           </button>
           <button mat-mini-fab class="profile-btn">
             <mat-icon>person</mat-icon>
@@ -53,33 +43,25 @@ import { CommonModule } from '@angular/common';
     </main>
   `,
   styles: [`
-    /* Navbar futurista */
-    .futuristic-navbar {
+    /* Navbar con fondo sólido */
+    .main-navbar {
       position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 40px);
-      max-width: 1200px;
+      top: 0;
+      left: 0;
+      right: 0;
       z-index: 1000;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(20px);
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
       padding: 12px 24px;
-      animation: slideInFromTop 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    @keyframes slideInFromTop {
-      0% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
-      100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+      border-bottom: 3px solid #667eea;
     }
 
     .navbar-content {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
     .brand-section {
@@ -92,12 +74,11 @@ import { CommonModule } from '@angular/common';
       width: 50px;
       height: 50px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 15px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-      animation: glow 3s ease-in-out infinite;
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
     }
 
     .brand-icon {
@@ -109,19 +90,18 @@ import { CommonModule } from '@angular/common';
 
     .brand-text h1 {
       font-size: 24px;
-      font-weight: 900;
-      background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+      color: white;
       margin: 0;
-      letter-spacing: 2px;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     .brand-text span {
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.7);
-      font-weight: 300;
-      letter-spacing: 4px;
+      color: #a0aec0;
+      font-weight: 400;
+      letter-spacing: 1px;
       text-transform: uppercase;
     }
 
@@ -135,39 +115,41 @@ import { CommonModule } from '@angular/common';
       width: 44px;
       height: 44px;
       background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
+      border-radius: 10px;
       color: white;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.3s ease;
     }
 
     .nav-button:hover {
       background: rgba(255, 255, 255, 0.2);
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+      box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
     }
 
     .profile-btn {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      box-shadow: 0 8px 24px rgba(240, 147, 251, 0.4);
+      background: linear-gradient(135d, #667eea 0%, #764ba2 100%);
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+      color: white;
     }
 
     .main-container {
-      padding-top: 100px;
+      padding-top: 90px;
       min-height: 100vh;
     }
 
     /* Responsive */
     @media (max-width: 768px) {
-      .futuristic-navbar {
-        top: 10px;
-        width: calc(100% - 20px);
+      .main-navbar {
         padding: 8px 16px;
       }
       
       .brand-text h1 {
-        font-size: 20px;
+        font-size: 18px;
+      }
+      
+      .brand-text span {
+        font-size: 10px;
       }
       
       .brand-icon-container {
@@ -176,15 +158,9 @@ import { CommonModule } from '@angular/common';
       }
       
       .main-container {
-        padding-top: 80px;
+        padding-top: 70px;
       }
     }
   `]
 })
-export class AppComponent {
-  particles = Array(15).fill(0).map(() => ({
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    delay: Math.random() * 6
-  }));
-}
+export class AppComponent {}
