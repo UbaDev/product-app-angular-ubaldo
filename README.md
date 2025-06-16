@@ -176,6 +176,8 @@ npm run lint       # Linting código
 El proyecto cuenta con un historial de commits bien estructurado y descriptivo:
 
 ```
+fix: eliminación del campo descripcion para mas limpieza
+fix: eliminacion de dependencias que evitaban hacer deploy
 fix: mejoras en el archivo readme (integracion de imagenes)
 feat: mejoras en el comportamiento del CRUD
 fix: corrección de estilos en texto al perderse en background  

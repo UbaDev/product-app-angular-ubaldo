@@ -96,20 +96,7 @@
           </mat-form-field>
         </div>
 
-        <mat-form-field appearance="outline" class="form-field full-width">
-          <mat-label>Descripción</mat-label>
-          <textarea
-            matInput
-            formControlName="description"
-            rows="3"
-            placeholder="Descripción del producto..."
-          ></textarea>
-          <mat-error
-            *ngIf="productForm.get('description')?.hasError('required')"
-          >
-            La descripción es obligatoria
-          </mat-error>
-        </mat-form-field>
+        
 
         <div class="form-actions">
           <button
