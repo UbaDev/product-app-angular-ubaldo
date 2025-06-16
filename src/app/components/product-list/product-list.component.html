@@ -4,6 +4,91 @@
     <div class="hero-content">
       <h1 class="hero-title">Descubre Productos Increíbles</h1>
       <p class="hero-subtitle">Encuentra exactamente lo que buscas en nuestra colección curada</p>
+      <button mat-fab 
+              extended 
+              color="accent" 
+              class="add-product-btn"
+              (click)="toggleAddForm()">
+        <mat-icon>add</mat-icon>
+        Agregar Producto
+      </button>
+    </div>
+  </section>
+
+  <!-- Add Product Form -->
+  <section *ngIf="showAddForm" class="add-form-section">
+    <div class="form-container">
+      <div class="form-header">
+        <h3>Agregar Nuevo Producto</h3>
+        <button mat-icon-button (click)="toggleAddForm()" class="close-btn">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+        <div class="form-grid">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Título del producto</mat-label>
+            <input matInput formControlName="title" placeholder="Ej: iPhone 15 Pro">
+            <mat-error *ngIf="productForm.get('title')?.hasError('required')">
+              El título es obligatorio
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Precio</mat-label>
+            <input matInput type="number" formControlName="price" placeholder="0.00">
+            <span matPrefix>$&nbsp;</span>
+            <mat-error *ngIf="productForm.get('price')?.hasError('required')">
+              El precio es obligatorio
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Categoría</mat-label>
+            <mat-select formControlName="category">
+              <mat-option value="electronics">Electronics</mat-option>
+              <mat-option value="jewelery">Jewelery</mat-option>
+              <mat-option value="men's clothing">Men's Clothing</mat-option>
+              <mat-option value="women's clothing">Women's Clothing</mat-option>
+            </mat-select>
+            <mat-error *ngIf="productForm.get('category')?.hasError('required')">
+              Selecciona una categoría
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>URL de la imagen</mat-label>
+            <input matInput formControlName="image" placeholder="https://...">
+            <mat-error *ngIf="productForm.get('image')?.hasError('required')">
+              La URL es obligatoria
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="form-field full-width">
+          <mat-label>Descripción</mat-label>
+          <textarea matInput formControlName="description" rows="3" placeholder="Describe el producto..."></textarea>
+          <mat-error *ngIf="productForm.get('description')?.hasError('required')">
+            La descripción es obligatoria
+          </mat-error>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="resetForm()" class="cancel-btn">
+            Limpiar
+          </button>
+          <button mat-raised-button 
+                  type="submit" 
+                  color="primary" 
+                  [disabled]="productForm.invalid || isSubmitting"
+                  class="submit-btn">
+            <mat-spinner *ngIf="isSubmitting" diameter="20" class="btn-spinner"></mat-spinner>
+            <span *ngIf="!isSubmitting">Crear Producto</span>
+            <span *ngIf="isSubmitting">Creando...</span>
+          </button>
+        </div>
+      </form>
     </div>
   </section>
 
@@ -25,8 +110,32 @@
 
     <div class="products-grid">
       <article *ngFor="let product of products; trackBy: trackByProductId" 
-               class="product-card">
+               class="product-card"
+               [class.editing]="editingProductId === product.id">
         
+        <!-- Edit Form Overlay -->
+        <div *ngIf="editingProductId === product.id" class="edit-overlay">
+          <form [formGroup]="editForm" (ngSubmit)="saveEdit()" class="edit-form">
+            <h4>Editar Producto</h4>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Título</mat-label>
+              <input matInput formControlName="title">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Precio</mat-label>
+              <input matInput type="number" formControlName="price">
+              <span matPrefix>$&nbsp;</span>
+            </mat-form-field>
+
+            <div class="edit-actions">
+              <button mat-button type="button" (click)="cancelEdit()">Cancelar</button>
+              <button mat-raised-button type="submit" color="primary">Guardar</button>
+            </div>
+          </form>
+        </div>
+
         <!-- Product Image -->
         <div class="product-image-container">
           <img [src]="product.image" 
@@ -34,25 +143,25 @@
                class="product-image"
                loading="lazy">
           <div class="image-overlay">
-            <button mat-fab color="accent" class="quick-view-btn">
-              <mat-icon>visibility</mat-icon>
+            <button mat-mini-fab color="primary" class="action-fab edit-fab" (click)="startEdit(product)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-mini-fab color="warn" class="action-fab delete-fab" (click)="deleteProduct(product)">
+              <mat-icon>delete</mat-icon>
             </button>
           </div>
         </div>
 
         <!-- Product Content -->
         <div class="product-content">
-          <!-- Category Chip -->
           <mat-chip-set class="category-chips">
             <mat-chip [color]="getCategoryColor(product.category)" selected>
               {{ product.category | titlecase }}
             </mat-chip>
           </mat-chip-set>
 
-          <!-- Product Title -->
           <h3 class="product-title">{{ product.title }}</h3>
 
-          <!-- Rating -->
           <div *ngIf="product.rating" class="rating-section">
             <div class="stars">
               <mat-icon *ngFor="let star of getStarArray(product.rating.rate)" 
@@ -64,13 +173,11 @@
             <span class="rating-text">{{ product.rating.rate }} ({{ product.rating.count }})</span>
           </div>
 
-          <!-- Price -->
           <div class="price-section">
             <span class="price">${{ product.price | number:'1.2-2' }}</span>
             <span class="price-label">USD</span>
           </div>
 
-          <!-- Actions -->
           <div class="product-actions">
             <button mat-raised-button color="primary" class="action-btn primary-btn">
               <mat-icon>add_shopping_cart</mat-icon>
