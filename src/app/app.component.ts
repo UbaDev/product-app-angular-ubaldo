@@ -28,7 +28,7 @@ import { CommonModule } from '@angular/common';
             <mat-icon class="brand-icon">rocket_launch</mat-icon>
           </div>
           <div class="brand-text">
-            <h1>NEXUS</h1>
+            <h1>UBALDO</h1>
             <span>Store</span>
           </div>
         </div>

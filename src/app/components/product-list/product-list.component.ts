@@ -1,16 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatBadgeModule } from '@angular/material/badge';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Product } from '../../models/product';
 import { ProductService } from '../../services/product.service';
 
@@ -20,16 +21,17 @@ import { ProductService } from '../../services/product.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    MatTableModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatChipsModule,
-    MatBadgeModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatSnackBarModule
+    MatChipsModule,
+    MatSnackBarModule,
+    MatTooltipModule
   ],
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
@@ -39,10 +41,11 @@ export class ProductListComponent implements OnInit {
   isLoading = true;
   showAddForm = false;
   isSubmitting = false;
-  editingProductId: number | null = null;
+  editingProduct: Product | null = null;
+  
+  displayedColumns: string[] = ['image', 'title', 'price', 'category', 'actions'];
   
   productForm: FormGroup;
-  editForm: FormGroup;
 
   constructor(
     private productService: ProductService,
@@ -56,132 +59,170 @@ export class ProductListComponent implements OnInit {
       category: ['', Validators.required],
       image: ['', Validators.required]
     });
-
-    this.editForm = this.fb.group({
-      title: ['', [Validators.required, Validators.minLength(3)]],
-      price: ['', [Validators.required, Validators.min(0.01)]]
-    });
   }
 
   ngOnInit(): void {
     this.loadProducts();
   }
 
+  /**
+   * Carga todos los productos desde la API
+   */
   loadProducts(): void {
     this.isLoading = true;
     this.productService.getAllProducts().subscribe({
       next: (products) => {
         this.products = products;
         this.isLoading = false;
+        this.showSuccess('Productos cargados correctamente');
       },
       error: () => {
-        this.showMessage('Error al cargar productos', 'error');
+        this.showError('Error al cargar productos');
         this.isLoading = false;
       }
     });
   }
 
+  /**
+   * Muestra/oculta el formulario de agregar
+   */
   toggleAddForm(): void {
     this.showAddForm = !this.showAddForm;
-    if (!this.showAddForm) {
-      this.resetForm();
+    this.editingProduct = null;
+    if (this.showAddForm) {
+      this.productForm.reset();
     }
   }
 
+  /**
+   * Procesa el envío del formulario
+   */
   onSubmit(): void {
     if (this.productForm.valid) {
       this.isSubmitting = true;
-      const newProduct = this.productForm.value;
-      
-      this.productService.createProduct(newProduct).subscribe({
-        next: (product) => {
-          this.products.unshift(product);
-          this.showMessage('Producto creado exitosamente', 'success');
-          this.resetForm();
-          this.showAddForm = false;
-          this.isSubmitting = false;
-        },
-        error: () => {
-          this.showMessage('Error al crear producto', 'error');
-          this.isSubmitting = false;
-        }
-      });
+      const formData = this.productForm.value;
+
+      if (this.editingProduct) {
+        // Actualizar producto existente
+        this.productService.updateProduct(this.editingProduct.id!, formData).subscribe({
+          next: (updatedProduct) => {
+            const index = this.products.findIndex(p => p.id === this.editingProduct!.id);
+            if (index !== -1) {
+              this.products[index] = { ...this.products[index], ...formData };
+            }
+            this.showSuccess('Producto actualizado correctamente');
+            this.cancelForm();
+            this.isSubmitting = false;
+          },
+          error: () => {
+            this.showError('Error al actualizar el producto');
+            this.isSubmitting = false;
+          }
+        });
+      } else {
+        // Crear nuevo producto
+        this.productService.createProduct(formData).subscribe({
+          next: (newProduct) => {
+            // Agregar al inicio de la lista para visualización inmediata
+            this.products = [newProduct, ...this.products];
+            this.showSuccess('Producto creado correctamente');
+            this.cancelForm();
+            this.isSubmitting = false;
+          },
+          error: () => {
+            this.showError('Error al crear el producto');
+            this.isSubmitting = false;
+          }
+        });
+      }
+    } else {
+      this.markFormGroupTouched();
     }
   }
 
-  startEdit(product: Product): void {
-    this.editingProductId = product.id!;
-    this.editForm.patchValue({
+  /**
+   * Inicia la edición de un producto
+   */
+  editProduct(product: Product): void {
+    this.editingProduct = product;
+    this.showAddForm = true;
+    
+    // Prellenar el formulario con los datos del producto
+    this.productForm.patchValue({
       title: product.title,
-      price: product.price
+      price: product.price,
+      description: product.description,
+      category: product.category,
+      image: product.image
     });
   }
 
-  saveEdit(): void {
-    if (this.editForm.valid && this.editingProductId) {
-      const updates = this.editForm.value;
-      
-      this.productService.updateProduct(this.editingProductId, updates).subscribe({
-        next: (updatedProduct) => {
-          const index = this.products.findIndex(p => p.id === this.editingProductId);
-          if (index !== -1) {
-            this.products[index] = { ...this.products[index], ...updates };
-          }
-          this.showMessage('Producto actualizado exitosamente', 'success');
-          this.cancelEdit();
-        },
-        error: () => {
-          this.showMessage('Error al actualizar producto', 'error');
-        }
-      });
-    }
-  }
-
-  cancelEdit(): void {
-    this.editingProductId = null;
-    this.editForm.reset();
-  }
-
+  /**
+   * Elimina un producto con confirmación
+   */
   deleteProduct(product: Product): void {
-    if (confirm(`¿Estás seguro de eliminar "${product.title}"?`)) {
+    const confirmDelete = confirm(
+      `¿Está seguro que desea eliminar el producto "${product.title}"?\n\nEsta acción no se puede deshacer.`
+    );
+
+    if (confirmDelete) {
       this.productService.deleteProduct(product.id!).subscribe({
         next: () => {
           this.products = this.products.filter(p => p.id !== product.id);
-          this.showMessage('Producto eliminado exitosamente', 'success');
+          this.showSuccess('Producto eliminado correctamente');
         },
         error: () => {
-          this.showMessage('Error al eliminar producto', 'error');
+          this.showError('Error al eliminar el producto');
         }
       });
     }
   }
 
-  resetForm(): void {
+  /**
+   * Cancela la edición/creación
+   */
+  cancelForm(): void {
+    this.showAddForm = false;
+    this.editingProduct = null;
     this.productForm.reset();
   }
 
-  getCategoryColor(category: string): string {
-    const colors: {[key: string]: string} = {
-      'electronics': 'primary',
-      'jewelery': 'accent',
-      "men's clothing": 'warn',
-      "women's clothing": ''
-    };
-    return colors[category] || '';
+  /**
+   * Maneja errores de carga de imagen
+   */
+  onImageError(event: any): void {
+    event.target.src = 'https://via.placeholder.com/60x60?text=Sin+Imagen';
   }
 
-  getStarArray(rating: number): number[] {
-    return Array(5).fill(0).map((_, i) => i < Math.floor(rating) ? 1 : 0);
+  /**
+   * Marca todos los campos como tocados para mostrar errores
+   */
+  private markFormGroupTouched(): void {
+    Object.keys(this.productForm.controls).forEach(key => {
+      const control = this.productForm.get(key);
+      control?.markAsTouched();
+    });
   }
 
-  trackByProductId(index: number, product: Product): number {
-    return product.id!;
-  }
-
-  private showMessage(message: string, type: 'success' | 'error'): void {
+  /**
+   * Muestra mensaje de éxito
+   */
+  private showSuccess(message: string): void {
     this.snackBar.open(message, 'Cerrar', {
-      duration: 4000,
-      panelClass: [`${type}-snackbar`],
+      duration: 3000,
+      panelClass: ['success-snackbar'],
+      horizontalPosition: 'end',
+      verticalPosition: 'top'
+    });
+  }
+
+  /**
+   * Muestra mensaje de error
+   */
+  private showError(message: string): void {
+    this.snackBar.open(message, 'Cerrar', {
+      duration: 5000,
+      panelClass: ['error-snackbar'],
       horizontalPosition: 'end',
       verticalPosition: 'top'
     });

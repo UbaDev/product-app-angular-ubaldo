@@ -1,195 +1,182 @@
-<div class="product-container">
-  <!-- Hero Section -->
-  <section class="hero-section">
-    <div class="hero-content">
-      <h1 class="hero-title">Descubre Productos Increíbles</h1>
-      <p class="hero-subtitle">Encuentra exactamente lo que buscas en nuestra colección curada</p>
-      <button mat-fab 
-              extended 
-              color="accent" 
-              class="add-product-btn"
+<div class="admin-container">
+  <!-- Header administrativo -->
+  <div class="admin-header">
+    <h1 class="page-title">Gestión de Productos</h1>
+    <p class="page-subtitle">Administra el catálogo de productos de la tienda</p>
+    
+    <div class="header-actions">
+      <button mat-raised-button 
+              color="primary" 
+              class="add-btn"
               (click)="toggleAddForm()">
         <mat-icon>add</mat-icon>
         Agregar Producto
       </button>
     </div>
-  </section>
+  </div>
 
-  <!-- Add Product Form -->
-  <section *ngIf="showAddForm" class="add-form-section">
-    <div class="form-container">
-      <div class="form-header">
-        <h3>Agregar Nuevo Producto</h3>
-        <button mat-icon-button (click)="toggleAddForm()" class="close-btn">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-      
+  <!-- Formulario de agregar/editar -->
+  <mat-card *ngIf="showAddForm || editingProduct" class="form-card">
+    <mat-card-header>
+      <mat-card-title>
+        {{ editingProduct ? 'Editar Producto' : 'Agregar Nuevo Producto' }}
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
       <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
-        <div class="form-grid">
+        <div class="form-row">
           <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Título del producto</mat-label>
-            <input matInput formControlName="title" placeholder="Ej: iPhone 15 Pro">
+            <mat-label>Nombre del producto</mat-label>
+            <input matInput formControlName="title" placeholder="Ingrese el nombre">
             <mat-error *ngIf="productForm.get('title')?.hasError('required')">
-              El título es obligatorio
+              El nombre es obligatorio
+            </mat-error>
+            <mat-error *ngIf="productForm.get('title')?.hasError('minlength')">
+              Mínimo 3 caracteres
             </mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Precio</mat-label>
-            <input matInput type="number" formControlName="price" placeholder="0.00">
+            <input matInput type="number" formControlName="price" placeholder="0.00" step="0.01">
             <span matPrefix>$&nbsp;</span>
             <mat-error *ngIf="productForm.get('price')?.hasError('required')">
               El precio es obligatorio
             </mat-error>
+            <mat-error *ngIf="productForm.get('price')?.hasError('min')">
+              El precio debe ser mayor a 0
+            </mat-error>
           </mat-form-field>
+        </div>
 
+        <div class="form-row">
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Categoría</mat-label>
             <mat-select formControlName="category">
-              <mat-option value="electronics">Electronics</mat-option>
-              <mat-option value="jewelery">Jewelery</mat-option>
-              <mat-option value="men's clothing">Men's Clothing</mat-option>
-              <mat-option value="women's clothing">Women's Clothing</mat-option>
+              <mat-option value="electronics">Electrónicos</mat-option>
+              <mat-option value="jewelery">Joyería</mat-option>
+              <mat-option value="men's clothing">Ropa de Hombre</mat-option>
+              <mat-option value="women's clothing">Ropa de Mujer</mat-option>
             </mat-select>
             <mat-error *ngIf="productForm.get('category')?.hasError('required')">
-              Selecciona una categoría
+              Seleccione una categoría
             </mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>URL de la imagen</mat-label>
-            <input matInput formControlName="image" placeholder="https://...">
+            <input matInput formControlName="image" placeholder="https://ejemplo.com/imagen.jpg">
             <mat-error *ngIf="productForm.get('image')?.hasError('required')">
-              La URL es obligatoria
+              La URL de la imagen es obligatoria
             </mat-error>
           </mat-form-field>
         </div>
 
         <mat-form-field appearance="outline" class="form-field full-width">
           <mat-label>Descripción</mat-label>
-          <textarea matInput formControlName="description" rows="3" placeholder="Describe el producto..."></textarea>
+          <textarea matInput formControlName="description" rows="3" 
+                    placeholder="Descripción del producto..."></textarea>
           <mat-error *ngIf="productForm.get('description')?.hasError('required')">
             La descripción es obligatoria
           </mat-error>
         </mat-form-field>
 
         <div class="form-actions">
-          <button mat-button type="button" (click)="resetForm()" class="cancel-btn">
-            Limpiar
+          <button mat-button type="button" (click)="cancelForm()" class="cancel-btn">
+            Cancelar
           </button>
           <button mat-raised-button 
                   type="submit" 
                   color="primary" 
                   [disabled]="productForm.invalid || isSubmitting"
                   class="submit-btn">
-            <mat-spinner *ngIf="isSubmitting" diameter="20" class="btn-spinner"></mat-spinner>
-            <span *ngIf="!isSubmitting">Crear Producto</span>
-            <span *ngIf="isSubmitting">Creando...</span>
+            <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+            <span *ngIf="!isSubmitting">
+              {{ editingProduct ? 'Actualizar' : 'Guardar' }}
+            </span>
           </button>
         </div>
       </form>
-    </div>
-  </section>
+    </mat-card-content>
+  </mat-card>
 
-  <!-- Loading State -->
-  <div *ngIf="isLoading" class="loading-section">
-    <div class="loading-content">
-      <mat-spinner diameter="60" class="loading-spinner"></mat-spinner>
-      <h3>Cargando productos increíbles...</h3>
-      <p>Preparando la mejor experiencia para ti</p>
-    </div>
+  <!-- Indicador de carga -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando productos...</p>
   </div>
 
-  <!-- Products Grid -->
-  <section *ngIf="!isLoading" class="products-section">
-    <div class="section-header">
-      <h2 class="section-title">Catálogo de Productos</h2>
-      <p class="section-subtitle">{{ products.length }} productos disponibles</p>
-    </div>
+  <!-- Tabla de productos -->
+  <mat-card *ngIf="!isLoading" class="table-card">
+    <mat-card-header>
+      <mat-card-title>Lista de Productos ({{ products.length }})</mat-card-title>
+    </mat-card-header>
 
-    <div class="products-grid">
-      <article *ngFor="let product of products; trackBy: trackByProductId" 
-               class="product-card"
-               [class.editing]="editingProductId === product.id">
-        
-        <!-- Edit Form Overlay -->
-        <div *ngIf="editingProductId === product.id" class="edit-overlay">
-          <form [formGroup]="editForm" (ngSubmit)="saveEdit()" class="edit-form">
-            <h4>Editar Producto</h4>
-            
-            <mat-form-field appearance="outline">
-              <mat-label>Título</mat-label>
-              <input matInput formControlName="title">
-            </mat-form-field>
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="products" class="products-table">
+          
+          <!-- Columna Imagen -->
+          <ng-container matColumnDef="image">
+            <th mat-header-cell *matHeaderCellDef>Imagen</th>
+            <td mat-cell *matCellDef="let product">
+              <img [src]="product.image" 
+                   [alt]="product.title" 
+                   class="product-thumb"
+                   (error)="onImageError($event)">
+            </td>
+          </ng-container>
 
-            <mat-form-field appearance="outline">
-              <mat-label>Precio</mat-label>
-              <input matInput type="number" formControlName="price">
-              <span matPrefix>$&nbsp;</span>
-            </mat-form-field>
+          <!-- Columna Nombre -->
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef>Nombre</th>
+            <td mat-cell *matCellDef="let product" class="product-name">
+              {{ product.title }}
+            </td>
+          </ng-container>
 
-            <div class="edit-actions">
-              <button mat-button type="button" (click)="cancelEdit()">Cancelar</button>
-              <button mat-raised-button type="submit" color="primary">Guardar</button>
-            </div>
-          </form>
-        </div>
+          <!-- Columna Precio -->
+          <ng-container matColumnDef="price">
+            <th mat-header-cell *matHeaderCellDef>Precio</th>
+            <td mat-cell *matCellDef="let product" class="product-price">
+              ${{ product.price | number:'1.2-2' }}
+            </td>
+          </ng-container>
 
-        <!-- Product Image -->
-        <div class="product-image-container">
-          <img [src]="product.image" 
-               [alt]="product.title" 
-               class="product-image"
-               loading="lazy">
-          <div class="image-overlay">
-            <button mat-mini-fab color="primary" class="action-fab edit-fab" (click)="startEdit(product)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-mini-fab color="warn" class="action-fab delete-fab" (click)="deleteProduct(product)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </div>
+          <!-- Columna Categoría -->
+          <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef>Categoría</th>
+            <td mat-cell *matCellDef="let product">
+              <mat-chip class="category-chip">
+                {{ product.category | titlecase }}
+              </mat-chip>
+            </td>
+          </ng-container>
 
-        <!-- Product Content -->
-        <div class="product-content">
-          <mat-chip-set class="category-chips">
-            <mat-chip [color]="getCategoryColor(product.category)" selected>
-              {{ product.category | titlecase }}
-            </mat-chip>
-          </mat-chip-set>
+          <!-- Columna Acciones -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let product" class="actions-cell">
+              <button mat-icon-button 
+                      color="primary" 
+                      (click)="editProduct(product)"
+                      matTooltip="Editar producto">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button 
+                      color="warn" 
+                      (click)="deleteProduct(product)"
+                      matTooltip="Eliminar producto">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
 
-          <h3 class="product-title">{{ product.title }}</h3>
-
-          <div *ngIf="product.rating" class="rating-section">
-            <div class="stars">
-              <mat-icon *ngFor="let star of getStarArray(product.rating.rate)" 
-                        class="star" 
-                        [class.filled]="star === 1">
-                star
-              </mat-icon>
-            </div>
-            <span class="rating-text">{{ product.rating.rate }} ({{ product.rating.count }})</span>
-          </div>
-
-          <div class="price-section">
-            <span class="price">${{ product.price | number:'1.2-2' }}</span>
-            <span class="price-label">USD</span>
-          </div>
-
-          <div class="product-actions">
-            <button mat-raised-button color="primary" class="action-btn primary-btn">
-              <mat-icon>add_shopping_cart</mat-icon>
-              Agregar al Carrito
-            </button>
-            <button mat-stroked-button color="accent" class="action-btn secondary-btn">
-              <mat-icon>favorite_border</mat-icon>
-              Me Gusta
-            </button>
-          </div>
-        </div>
-      </article>
-    </div>
-  </section>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
 </div>
