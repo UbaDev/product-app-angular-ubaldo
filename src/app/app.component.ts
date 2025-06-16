@@ -24,12 +24,6 @@ import { CommonModule } from '@angular/common';
         </div>
         
         <div class="nav-actions">
-          <button mat-icon-button class="nav-button">
-            <mat-icon>search</mat-icon>
-          </button>
-          <button mat-icon-button class="nav-button">
-            <mat-icon>settings</mat-icon>
-          </button>
           <button mat-mini-fab class="profile-btn">
             <mat-icon>person</mat-icon>
           </button>

@@ -55,6 +55,7 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  color: #fff !important;
 }
 
 .add-btn:hover {
@@ -74,10 +75,9 @@
 }
 
 .form-card mat-card-header {
-  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  background: linear-gradient(135deg, #667eea 3%, #2d3748 100%);
   color: white;
-  margin: -24px -24px 32px -24px;
-  padding: 32px;
+  padding: 20px 35px;
   position: relative;
 }
 
@@ -176,6 +176,7 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
   transition: all 0.3s ease;
+  color: #fff !important;
 }
 
 .submit-btn:hover:not([disabled]) {
@@ -216,9 +217,8 @@
 }
 
 .table-card mat-card-header {
-  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  background: linear-gradient(135deg, #667eea 3%, #2d3748 100%);
   border-bottom: none;
-  margin: -24px -24px 0 -24px;
   padding: 24px 32px;
   position: relative;
 }
