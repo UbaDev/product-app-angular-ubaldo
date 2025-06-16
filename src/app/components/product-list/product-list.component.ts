@@ -74,7 +74,7 @@ export class ProductListComponent implements OnInit {
       next: (products) => {
         this.products = products;
         this.isLoading = false;
-        this.showSuccess('Productos cargados correctamente');
+        this.showSuccess(`📦 ${products.length} productos cargados desde FakeStore API`);
       },
       error: () => {
         this.showError('Error al cargar productos');
@@ -95,7 +95,7 @@ export class ProductListComponent implements OnInit {
   }
 
   /**
-   * Procesa el envío del formulario
+   * Procesa el envío del formulario con manejo correcto de memoria
    */
   onSubmit(): void {
     if (this.productForm.valid) {
@@ -103,34 +103,78 @@ export class ProductListComponent implements OnInit {
       const formData = this.productForm.value;
 
       if (this.editingProduct) {
-        // Actualizar producto existente
-        this.productService.updateProduct(this.editingProduct.id!, formData).subscribe({
-          next: (updatedProduct) => {
-            const index = this.products.findIndex(p => p.id === this.editingProduct!.id);
-            if (index !== -1) {
-              this.products[index] = { ...this.products[index], ...formData };
-            }
-            this.showSuccess('Producto actualizado correctamente');
-            this.cancelForm();
-            this.isSubmitting = false;
-          },
-          error: () => {
-            this.showError('Error al actualizar el producto');
-            this.isSubmitting = false;
+        // EDITAR PRODUCTO EXISTENTE
+        const isLocalProduct = this.editingProduct.id! > 1000;
+        
+        if (isLocalProduct) {
+          // Producto local - editar directamente en memoria
+          console.log('✏️ Editando producto LOCAL en memoria:', this.editingProduct.id);
+          
+          const index = this.products.findIndex(p => p.id === this.editingProduct!.id);
+          if (index !== -1) {
+            this.products[index] = { 
+              ...this.products[index], 
+              ...formData 
+            };
+            console.log('💾 Producto local actualizado:', this.products[index]);
           }
-        });
+          
+          this.showSuccess('✅ Producto local actualizado en memoria');
+          this.cancelForm();
+          this.isSubmitting = false;
+          
+        } else {
+          // Producto de API - simular actualización
+          console.log('🌐 Simulando edición de producto API:', this.editingProduct.id);
+          
+          this.productService.updateProduct(this.editingProduct.id!, formData).subscribe({
+            next: (response) => {
+              console.log('📥 API simuló actualización:', response);
+              
+              // Actualizar visualmente en la lista local
+              const index = this.products.findIndex(p => p.id === this.editingProduct!.id);
+              if (index !== -1) {
+                this.products[index] = { 
+                  ...this.products[index], 
+                  ...formData 
+                };
+                console.log('💾 Producto API actualizado localmente:', this.products[index]);
+              }
+              
+              this.showSuccess('✅ Producto API actualizado (simulado + local)');
+              this.cancelForm();
+              this.isSubmitting = false;
+            },
+            error: () => {
+              this.showError('❌ Error al actualizar el producto');
+              this.isSubmitting = false;
+            }
+          });
+        }
+        
       } else {
-        // Crear nuevo producto
+        // CREAR NUEVO PRODUCTO
+        console.log('🆕 Creando nuevo producto...');
+        
         this.productService.createProduct(formData).subscribe({
-          next: (newProduct) => {
-            // Agregar al inicio de la lista para visualización inmediata
-            this.products = [newProduct, ...this.products];
-            this.showSuccess('Producto creado correctamente');
+          next: (response) => {
+            console.log('📥 API simuló creación:', response);
+            
+            const newProductLocal = {
+              ...formData,
+              id: Date.now(), // ID único para esta sesión
+              rating: { rate: 0, count: 0 }
+            };
+            
+            console.log('💾 Guardando producto nuevo en memoria:', newProductLocal);
+            this.products = [newProductLocal, ...this.products];
+            
+            this.showSuccess('✅ Producto creado y guardado en memoria');
             this.cancelForm();
             this.isSubmitting = false;
           },
           error: () => {
-            this.showError('Error al crear el producto');
+            this.showError('❌ Error al crear el producto');
             this.isSubmitting = false;
           }
         });
@@ -141,9 +185,14 @@ export class ProductListComponent implements OnInit {
   }
 
   /**
-   * Inicia la edición de un producto
+   * Inicia la edición con feedback mejorado - FUNCIÓN CORREGIDA
    */
   editProduct(product: Product): void {
+    const isLocalProduct = product.id! > 1000;
+    const productType = isLocalProduct ? 'local (en memoria)' : 'API (simulado)';
+    
+    console.log(`✏️ Iniciando edición de producto ${productType}:`, product);
+    
     this.editingProduct = product;
     this.showAddForm = true;
     
@@ -155,26 +204,48 @@ export class ProductListComponent implements OnInit {
       category: product.category,
       image: product.image
     });
+    
+    // Mostrar información sobre el tipo de edición
+    if (isLocalProduct) {
+      this.showSuccess(`📝 Editando producto local - cambios se guardan directamente en memoria`);
+    } else {
+      this.showSuccess(`📝 Editando producto API - cambios son simulados pero se ven localmente`);
+    }
   }
 
   /**
-   * Elimina un producto con confirmación
+   * Elimina productos con manejo correcto de memoria
    */
   deleteProduct(product: Product): void {
+    const isLocalProduct = product.id! > 1000;
+    const productType = isLocalProduct ? 'LOCAL (en memoria)' : 'API (simulado)';
+    
     const confirmDelete = confirm(
-      `¿Está seguro que desea eliminar el producto "${product.title}"?\n\nEsta acción no se puede deshacer.`
+      `🗑️ ¿Eliminar "${product.title}"?\n\n📍 Tipo: ${productType}\n⚠️ Esta acción no se puede deshacer en esta sesión.`
     );
 
     if (confirmDelete) {
-      this.productService.deleteProduct(product.id!).subscribe({
-        next: () => {
-          this.products = this.products.filter(p => p.id !== product.id);
-          this.showSuccess('Producto eliminado correctamente');
-        },
-        error: () => {
-          this.showError('Error al eliminar el producto');
-        }
-      });
+      if (isLocalProduct) {
+        // Producto local - eliminar directamente de memoria
+        console.log('🗑️ Eliminando producto LOCAL de memoria:', product.id);
+        this.products = this.products.filter(p => p.id !== product.id);
+        this.showSuccess(`✅ Producto local "${product.title}" eliminado de memoria`);
+        
+      } else {
+        // Producto de API - simular eliminación
+        console.log('🌐 Simulando eliminación de producto API:', product.id);
+        
+        this.productService.deleteProduct(product.id!).subscribe({
+          next: () => {
+            console.log('📥 API simuló eliminación');
+            this.products = this.products.filter(p => p.id !== product.id);
+            this.showSuccess(`✅ Producto API "${product.title}" eliminado (simulado + local)`);
+          },
+          error: () => {
+            this.showError('❌ Error al eliminar el producto');
+          }
+        });
+      }
     }
   }
 
