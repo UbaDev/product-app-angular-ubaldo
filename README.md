@@ -163,10 +163,57 @@ npm run lint       # Linting código
 - **Tablet**: Grid de 2 columnas adaptativo
 - **Móvil**: Columna única con navegación optimizada
 
-## 🔗 Enlaces
+## 📝 Entregables del Proyecto
 
+### ✅ Repositorio GitHub
+- **README completo** con toda la documentación necesaria
+- **Pasos detallados** para ejecutar la aplicación localmente
+- **Enlace directo** a la API utilizada: [FakeStore API](https://fakestoreapi.com)
+- **Capturas de pantalla** y demo funcional incluida
+- **Enlace a demo en línea** desplegada en Vercel (opcional)
+
+### 📊 Historial de Commits
+El proyecto cuenta con un historial de commits bien estructurado y descriptivo:
+
+```
+feat: mejoras en el comportamiento del CRUD
+fix: corrección de estilos en texto al perderse en background  
+fix: corregir contraste en navbar principal y simplificar chips de categoría
+refactor: agregar tabla para una mejor gestión de productos
+style: rediseñar completamente con estética futurista y glassmorphism
+feat: creación del archivo readme
+feat: implementar CRUD completo con formularios inline y edición visual
+feat: crear lista de productos con diseño moderno
+feat: configurar arquitectura standalone moderna con diseño angular material
+initial commit
+```
+
+### 🎯 Cumplimiento de Requisitos
+- ✅ **Tabla con productos** (nombre, precio, categoría, imagen)
+- ✅ **Formulario para agregar** productos (simulado)
+- ✅ **Edición de productos** usando formularios prellenados
+- ✅ **Eliminación con confirmación** mediante diálogo nativo
+- ✅ **Validaciones completas** en todos los campos de formularios
+- ✅ **Indicadores visuales** de carga, éxito y error con SnackBar
+
+## 🔗 Enlaces y Referencias
+
+- [Repositorio GitHub](https://github.com/tu-usuario/product-app-angular-tu-nombre)
+- [Demo en Vivo](https://tu-demo-url.vercel.app)
+- [FakeStore API Documentation](https://fakestoreapi.com/docs)
 - [Angular Documentation](https://angular.io/docs)
-- [Angular Material](https://material.angular.io)
-- [FakeStore API](https://fakestoreapi.com)
-- [Vercel Deployment](https://vercel.com/docs)
+- [Angular Material Components](https://material.angular.io)
+- [Vercel Deployment Guide](https://vercel.com/docs)
 
+## 📸 Capturas de Pantalla
+
+### Vista Principal - Tabla de Productos
+![Tabla de Productos](./src/assets/tabla.png)
+
+### Formulario de Crear/Editar
+![Formulario CRUD](./src/assets//agregar.png)
+
+### Confirmación de Eliminación
+![Confirmación Delete](./src/assets//eliminar.png)
+
+---
