@@ -45,8 +45,8 @@ Una aplicación moderna de gestión de productos con diseño ultra-vibrante, des
 
 1. **Clonar repositorio**
    ```bash
-   git clone https://github.com/tu-usuario/product-app-angular-tu-nombre.git
-   cd product-app-angular-tu-nombre
+   git clone https://github.com/tu-usuario/product-app-angular-ubaldo.git
+   cd product-app-angular-ubaldo
    ```
 
 2. **Instalar dependencias**
@@ -137,7 +137,7 @@ vercel --prod
 ### Configuración Build
 Vercel detecta automáticamente:
 - **Build Command**: `ng build`
-- **Output Directory**: `dist/product-app-angular-tu-nombre`
+- **Output Directory**: `dist/product-app-angular-ubaldo`
 - **Install Command**: `npm install`
 
 ## 🔧 Scripts Disponibles
@@ -199,7 +199,7 @@ initial commit
 
 ## 🔗 Enlaces y Referencias
 
-- [Repositorio GitHub](https://github.com/tu-usuario/product-app-angular-tu-nombre)
+- [Repositorio GitHub](https://github.com/tu-usuario/product-app-angular-tu-ubaldo)
 - [Demo en Vivo](https://tu-demo-url.vercel.app)
 - [FakeStore API Documentation](https://fakestoreapi.com/docs)
 - [Angular Documentation](https://angular.io/docs)
